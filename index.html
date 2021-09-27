@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Mobile slider</title>
+    <meta name="description" content="slider">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: whitesmoke;
+            line-height: 1.6;
+        }
+
+        header h1 {
+            text-align: center;
+        }
+
+        .slidecon {
+            height: 100vh;
+            display: inline-flex;
+            overflow: hidden;
+            transform: translateX(0);
+        }
+
+        .slide {
+            max-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            user-select: none;
+
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 60%;
+        }
+
+        .slide p {
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .grabbing {
+            cursor: grabbing;
+        }
+
+        .grabbing .slide img {
+            transform: scale(0.9);
+        }
+    </style>
+    <header>
+        <h1>Explore rooms</h1>
+    </header>
+
+    <div class="slidecon">
+        <div class="slide">
+            <img src="44_KMA1907a-1600x1203.jpeg" alt="picture1">
+            <p> Room 1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh pellentesque mattis feugiat
+                mi non.
+            </p>
+        </div>
+
+        <div class="slide">
+            <img src="3_KMA0508-1600x1226.jpeg" alt="picture1">
+            <p> Room 2 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh pellentesque mattis feugiat
+                mi non.
+            </p>
+        </div>
+        <div class="slide">
+            <img src="44_KMA1907a-1600x1203.jpeg" alt="picture1">
+            <p> Room 3 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh pellentesque mattis feugiat
+                mi non.
+            </p>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        const slider = document.querySelector(".slidecon"),
+            slides = Array.from(document.querySelectorAll(".slide"));
+
+
+        let isdrabbing = false,
+            startPos = 0,
+            currentTranslate = 0,
+            prevTranslate = 0,
+            animationId = 0,
+            currentIndex = 0;
+
+        slides.forEach((slide, index) => {
+            const slideImage = slide.querySelector("img")
+            slideImage.addEventListener('dragstart', (e) => e.preventDefault())
+
+
+            slide.addEventListener('touchstart', touchStart(index))
+            slide.addEventListener('touchend', touchEnd)
+            slide.addEventListener('touchmove', touchMove)
+        })
+
+        function touchStart(index) {
+            return function (event) {
+                currentIndex = index
+                startPos = getPositionX(event)
+                isDragging = true;
+
+                animationId = requestAnimationFrame(animation)
+                slider.classList.add('grabbing');
+            }
+        }
+
+        function touchEnd(event) {
+            isDragging = false;
+            cancelAnimationFrame(animationId)
+
+            const movedBy = currentTranslate - prevTranslate
+
+            if (movedBy < -100 && currentIndex < slides.length - 1)
+                currentIndex += 1
+
+            if (movedBy > 100 && currentIndex > 0)
+                currentIndex -= 1
+
+            setPositionByIndex()
+
+
+            slider.classList.remove('grabbing');
+        }
+
+        function touchMove(event) {
+            if (isDragging) {
+                const currentPosition = getPositionX(event)
+                currentTranslate = prevTranslate + currentPosition - startPos
+            }
+        }
+
+        function getPositionX(event) {
+            return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX
+        }
+
+        function animation() {
+            setSliderPosition()
+            if (isDragging) requestAnimationFrame(animation)
+        }
+
+        function setSliderPosition() {
+            slider.style.transform = `translateX(${currentTranslate}px)`
+        }
+
+
+        function setPositionByIndex() {
+            currentTranslate = currentIndex * -window.innerWidth
+            prevTranslate = currentTranslate
+            setSliderPosition()
+        }
+    </script>
+</body>
+
+</html>
